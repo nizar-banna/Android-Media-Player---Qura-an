@@ -94,4 +94,20 @@
         android:layout_marginTop="97dp"
         android:text="TextView" />
 
+    <ImageView
+        android:id="@+id/download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="110dp"
+        android:layout_marginEnd="51dp"
+        app:srcCompat="@drawable/ic_download" />
+
+    <ImageView
+        android:id="@+id/t"
+        android:src="@mipmap/ic_launcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 </RelativeLayout>

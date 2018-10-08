@@ -6,6 +6,10 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 //import com.example.nizar.quraanapp.adapter.ListItemAdapter;
 import com.example.nizar.quraanapp.R;
@@ -30,11 +34,13 @@ public class MainListActivity extends BaseActivity implements ListItemAdapter.On
     AsyncHttpClient asyncHttpClient;
     List<SurahDetails> surahDetailsList;
     RecyclerView rv;
+    ImageButton download;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_list);
         rv = findViewById(R.id.rv);
+        download = findViewById(R.id.download);
         loadData();
         rv.setLayoutManager( new LinearLayoutManager(this));
         final ListItemAdapter adapter = new ListItemAdapter(surahDetailsList,getApplicationContext());
@@ -61,6 +67,12 @@ public class MainListActivity extends BaseActivity implements ListItemAdapter.On
             }
         });
 
+//        download.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Toast.makeText(MainListActivity.this, "download", Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
     }
 

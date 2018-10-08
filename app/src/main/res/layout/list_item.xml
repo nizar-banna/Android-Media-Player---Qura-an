@@ -14,12 +14,15 @@
         android:textColor="#ffff"
         android:textSize="30sp" />
 
-    <ImageView
+    <ImageButton
         android:layout_weight="1"
         android:layout_gravity="center"
         android:gravity="center"
+        android:background="#8c7474"
         android:src="@drawable/ic_download0"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+
 
 </LinearLayout>
