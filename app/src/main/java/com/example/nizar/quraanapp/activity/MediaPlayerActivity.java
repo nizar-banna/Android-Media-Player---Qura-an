@@ -35,6 +35,8 @@ import com.example.nizar.quraanapp.download.DownloadSongService;
 import java.io.File;
 import java.io.IOException;
 
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
+
 public class MediaPlayerActivity extends AppCompatActivity {
     private Handler mHandler = new Handler();
     private Utilities utils;
@@ -50,6 +52,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
     int no, length = 0, seekBarValue = 0;
     private DownloadManager downloadManager;
     private long Music_DownloadId;
+    long referenceId;
     String path = "https://server11.mp3quran.net/hazza/001.mp3", name, number;
 
     @Override
@@ -107,13 +110,13 @@ public class MediaPlayerActivity extends AppCompatActivity {
                 if (mediaPlayer.isPlaying()) {
                     mediaPlayer.pause();
                     playMedia.setImageResource(R.drawable.play_btn);
-                    Toast.makeText(getApplicationContext(), "ffff" + length, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Pause" + length, Toast.LENGTH_SHORT).show();
                 } else {
                     if (mediaPlayer != null) {
 //                        mediaPlayer.seekTo(seekBarValue);
                         mediaPlayer.start();
                         playMedia.setImageResource(R.drawable.pause_btn);
-                        Toast.makeText(getApplicationContext(), "dddddddd", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Resume", Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -152,11 +155,9 @@ public class MediaPlayerActivity extends AppCompatActivity {
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MediaPlayerActivity.this, "Downloading", Toast.LENGTH_SHORT).show();
 //                if(downloadManager.ERROR_FILE_ALREADY_EXISTS ==1009){
 //                    Toast.makeText(MediaPlayerActivity.this, "Exsist", Toast.LENGTH_SHORT).show();
 //                }
-
                 startDownload();
             }
         });
@@ -359,12 +360,14 @@ public class MediaPlayerActivity extends AppCompatActivity {
 
 
     private void startDownload() {
-        File applictionFile = new File(Environment.
-                getExternalStoragePublicDirectory(Environment
-                        .DIRECTORY_DOWNLOADS) + number + ".mp3");
+//        File applictionFile = new File(Environment.
+//                getExternalStoragePublicDirectory(Environment
+//                        .DIRECTORY_DOWNLOADS).getAbsolutePath()+"/"+ "001.mp3");
 
-        if (applictionFile.exists()) {
-            Toast.makeText(getApplicationContext(), "File Already Exists",
+        File applicationFile = new File(getExternalFilesDir(DIRECTORY_DOWNLOADS)+"/"+number+".mp3");
+
+        if (applicationFile.exists()) {
+            Toast.makeText(getApplicationContext(), "الملف موجود مسبقاَ",
                     Toast.LENGTH_LONG).show();
         }else {
             Uri music_uri = Uri.parse(path);
@@ -372,6 +375,8 @@ public class MediaPlayerActivity extends AppCompatActivity {
             //set filter to only when download is complete and register broadcast receiver
             IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
             registerReceiver(downloadReceiver, filter);
+            Toast.makeText(MediaPlayerActivity.this, "جاري التحميل .. ", Toast.LENGTH_SHORT).show();
+
         }
     }
 
@@ -388,7 +393,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
         request.setDescription("القران الكريم");
 
         //Set the local destination for the downloaded file to a path within the application's external files directory
-        request.setDestinationInExternalFilesDir(MediaPlayerActivity.this, Environment.DIRECTORY_DOWNLOADS, number + ".mp3");
+        request.setDestinationInExternalFilesDir(MediaPlayerActivity.this, DIRECTORY_DOWNLOADS, number + ".mp3");
 
         //Enqueue download and save the referenceId
         downloadReference = downloadManager.enqueue(request);
@@ -523,12 +528,12 @@ public class MediaPlayerActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
 
             //check if the broadcast message is for our Enqueued download
-            long referenceId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+             referenceId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
 
             if (referenceId == Music_DownloadId) {
 
                 Toast toast = Toast.makeText(MediaPlayerActivity.this,
-                        "Music Download Complete", Toast.LENGTH_LONG);
+                        "تم تحميل السورة", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.TOP, 25, 400);
                 toast.show();
             }
