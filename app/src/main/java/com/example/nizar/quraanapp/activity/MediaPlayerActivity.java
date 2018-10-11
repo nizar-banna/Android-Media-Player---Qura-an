@@ -53,6 +53,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
     private DownloadManager downloadManager;
     private long Music_DownloadId;
     long referenceId;
+    File applicationFile;
     String path = "https://server11.mp3quran.net/hazza/001.mp3", name, number;
 
     @Override
@@ -79,14 +80,21 @@ public class MediaPlayerActivity extends AppCompatActivity {
         num.setText(name);
         num.setTypeface(m_typeFace);
 
+        applicationFile = new File(getExternalFilesDir(DIRECTORY_DOWNLOADS)+"/"+number+".mp3");
         mediaPlayer = new MediaPlayer();
+
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         progressDialog = new ProgressDialog(this);
         if (!playPause) {
             playMedia.setImageResource(R.drawable.pause_btn);
 
             if (initialStage) {
-                new Player().execute(path);
+                if(applicationFile.exists()){
+                    playSurah(applicationFile);
+                    download.setImageResource(R.drawable.verified);
+                }else{
+                    new Player().execute(path);
+                }
             } else {
                 if (!mediaPlayer.isPlaying())
                     mediaPlayer.start();
@@ -155,9 +163,6 @@ public class MediaPlayerActivity extends AppCompatActivity {
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                if(downloadManager.ERROR_FILE_ALREADY_EXISTS ==1009){
-//                    Toast.makeText(MediaPlayerActivity.this, "Exsist", Toast.LENGTH_SHORT).show();
-//                }
                 startDownload();
             }
         });
@@ -276,31 +281,38 @@ public class MediaPlayerActivity extends AppCompatActivity {
             progressDialog.show();
         }
     }
-//    public void  playSurah(String path) {
-//        try {
-//            mediaPlayer.reset();
-//            mediaPlayer.setDataSource(path);
-//            mediaPlayer.prepare();
-//            mediaPlayer.start();
-//            // Changing Button Image to pause image
-//            playMedia.setImageResource(R.drawable.pause_btn);
-//            // set Progress bar values
-//            sb.setProgress(0);
-//            sb.setMax(100);
-//
-//            // Updating progress bar
-//            updateProgressBar();
-//        } catch (IllegalArgumentException e) {
-//            e.printStackTrace();
-//        } catch (IllegalStateException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Log.e("error", "error:" + e.getMessage());
-//        }
-//    }
+    public void  playSurah(File applicationFile) {
+        try {
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(applicationFile.getPath());
+            mediaPlayer.prepare();
+
+            int result = am.requestAudioFocus(focusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                // other app had stopped playing song now , so u can do u stuff now .
+                updateProgressBar();
+                mediaPlayer.start();
+            }
+
+            // Changing Button Image to pause image
+            playMedia.setImageResource(R.drawable.pause_btn);
+            // set Progress bar values
+            sb.setProgress(0);
+            sb.setMax(100);
+
+            // Updating progress bar
+            updateProgressBar();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("error", "error:" + e.getMessage());
+        }
+    }
 
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -364,7 +376,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
 //                getExternalStoragePublicDirectory(Environment
 //                        .DIRECTORY_DOWNLOADS).getAbsolutePath()+"/"+ "001.mp3");
 
-        File applicationFile = new File(getExternalFilesDir(DIRECTORY_DOWNLOADS)+"/"+number+".mp3");
+//         applicationFile = new File(getExternalFilesDir(DIRECTORY_DOWNLOADS)+"/"+number+".mp3");
 
         if (applicationFile.exists()) {
             Toast.makeText(getApplicationContext(), "الملف موجود مسبقاَ",
@@ -498,7 +510,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
                     "تم تحميل  "+name + "\n" + statusText + "\n" +
                             reasonText,
                     Toast.LENGTH_LONG);
-            toast.setGravity(Gravity.TOP, 25, 800);
+            toast.setGravity(Gravity.TOP, 100, 800);
             toast.show();
 
         } else {
@@ -534,32 +546,10 @@ public class MediaPlayerActivity extends AppCompatActivity {
 
                 Toast toast = Toast.makeText(MediaPlayerActivity.this,
                         "تم تحميل السورة", Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.TOP, 25, 400);
                 toast.show();
             }
 
         }
     };
 
-//    public void DownloadChecker() {
-//        File applictionFile = new File(Environment.
-//                getExternalStoragePublicDirectory(Environment
-//                        .DIRECTORY_DOWNLOADS).getAbsolutePath() + number + ".mp3");
-//
-//        if (applictionFile.exists()) {
-//            Toast.makeText(getApplicationContext(), "File Already Exists",
-//                    Toast.LENGTH_LONG).show();
-//        } else {
-//            String servicestring = Context.DOWNLOAD_SERVICE;
-//            DownloadManager downloadmanager;
-//            downloadmanager = (DownloadManager) getSystemService(servicestring);
-//            Uri uri = Uri.parse(path);
-//            DownloadManager.Request request = new DownloadManager.Request(uri);
-//            request.setDestinationInExternalFilesDir(MediaPlayerActivity.this,
-//                    Environment.DIRECTORY_DOWNLOADS, number + ".mp3");
-//
-//            Long reference = downloadmanager.enqueue(request);
-//        }
-//
-//    }
 }
