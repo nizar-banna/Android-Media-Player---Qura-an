@@ -1,14 +1,15 @@
 package com.example.nizar.quraanapp.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.Toast;
 
 //import com.example.nizar.quraanapp.adapter.ListItemAdapter;
@@ -24,6 +25,15 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,68 +42,110 @@ import cz.msebera.android.httpclient.Header;
 
 public class MainListActivity extends BaseActivity implements ListItemAdapter.OnClickListener  {
     AsyncHttpClient asyncHttpClient;
-    List<SurahDetails> surahDetailsList;
+    ArrayList<SurahDetails> surahDetailsList;
+    ArrayList<SurahDetails> savedList;
     RecyclerView rv;
-    ImageButton download;
+    Button btn;
+    Context mContext;
+    private static final String FILENAME = "data";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_list);
+        surahDetailsList = new ArrayList<>();
         rv = findViewById(R.id.rv);
-        download = findViewById(R.id.download);
-        loadData();
+        btn = findViewById(R.id.btn);
+//        loadData();
         rv.setLayoutManager( new LinearLayoutManager(this));
         final ListItemAdapter adapter = new ListItemAdapter(surahDetailsList,getApplicationContext());
         rv.setAdapter(adapter);
-        asyncHttpClient = new AsyncHttpClient();
-        asyncHttpClient.get("http://api.alquran.cloud/surah",null,new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                Gson gson = new Gson();
-                JsonResponse resp = gson.fromJson(response.toString(),JsonResponse.class);
-                surahDetailsList.addAll(resp.getData());
-                adapter.notifyDataSetChanged();
-                adapter.setOnItemClickListener(MainListActivity.this);
-                Log.e("TAG", "on Success" + resp.getData());
-                saveData();
-            }
+        Gson gson = new Gson();
+        JsonResponse resp = gson.fromJson(loadJSONFromAsset(mContext),JsonResponse.class);
+        surahDetailsList.addAll(resp.getData());
+        adapter.notifyDataSetChanged();
+        adapter.setOnItemClickListener(MainListActivity.this);
 
+      //  Log.d("ddddddd","dddd"+loadJSONFromAsset(mContext));
+        btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
-                Log.e("TAG", "on failure" + errorResponse);
-
+            public void onClick(View view) {
+                Toast.makeText(MainListActivity.this, "saved"+savedList, Toast.LENGTH_SHORT).show();
             }
         });
 
-//        download.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Toast.makeText(MainListActivity.this, "download", Toast.LENGTH_SHORT).show();
-//            }
-//        });
+    }
+    public String loadJSONFromAsset(Context context) {
+        String json = null;
+        try {
+//            InputStream is = context.getAssets().open("surah.json");
+            AssetManager mngr = getAssets();
+            InputStream is = mngr.open("surah.json");
+
+            int size = is.available();
+
+            byte[] buffer = new byte[size];
+
+            is.read(buffer);
+
+            is.close();
+
+            json = new String(buffer, "UTF-8");
+
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
 
     }
+    private void saveArrayList(ArrayList<SurahDetails> arrayList) {
+        try {
+            FileOutputStream fileOutputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            ObjectOutputStream out = new ObjectOutputStream(fileOutputStream);
+            out.writeObject(arrayList);
+            out.close();
+            fileOutputStream.close();
 
-    private void saveData() {
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferenced",MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(surahDetailsList);
-        editor.putString("list",json);
-        editor.apply();
-    }
-    private void loadData(){
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferenced",MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString("list",null);
-        Type type = new TypeToken<ArrayList<SurahDetails>>(){}.getType();
-        surahDetailsList = gson.fromJson(json,type);
-        if (surahDetailsList == null){
-            surahDetailsList = new ArrayList<>();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+
+    private ArrayList<SurahDetails> getSavedArrayList() {
+        ArrayList<SurahDetails> savedArrayList = null;
+        try {
+            FileInputStream inputStream = openFileInput(FILENAME);
+            ObjectInputStream in = new ObjectInputStream(inputStream);
+            savedArrayList = (ArrayList<SurahDetails>) in.readObject();
+            in.close();
+            inputStream.close();
+
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return savedArrayList;
+    }
+
+//    private void saveData() {
+//        SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferenced",MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        Gson gson = new Gson();
+//        String json = gson.toJson(surahDetailsList);
+//        editor.putString("list",json);
+//        editor.apply();
+//    }
+//    private void loadData(){
+//        SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferenced",MODE_PRIVATE);
+//        Gson gson = new Gson();
+//        String json = sharedPreferences.getString("list",null);
+//        Type type = new TypeToken<ArrayList<SurahDetails>>(){}.getType();
+//        surahDetailsList = gson.fromJson(json,type);
+//        if (surahDetailsList == null){
+//            surahDetailsList = new ArrayList<>();
+//        }
+//    }
 
     @Override
     public void OnItemClick(int position) {
@@ -101,8 +153,8 @@ public class MainListActivity extends BaseActivity implements ListItemAdapter.On
         SurahDetails clicked = surahDetailsList.get(position);
         intent.putExtra("no",clicked.getNumber());
         intent.putExtra("name",clicked.getName());
-        setResult(100,intent);
         Log.d("success","fffffff");
         startActivity(intent);
+
     }
 }

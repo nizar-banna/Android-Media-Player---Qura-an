@@ -197,7 +197,38 @@ public class MediaPlayerActivity extends AppCompatActivity {
             mHandler.postDelayed(this, 100);
         }
     };
+    public void  playSurah(File applicationFile) {
+        try {
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(applicationFile.getPath());
+            mediaPlayer.prepare();
 
+            int result = am.requestAudioFocus(focusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                // other app had stopped playing song now , so u can do u stuff now .
+                updateProgressBar();
+                mediaPlayer.start();
+            }
+
+            // Changing Button Image to pause image
+            playMedia.setImageResource(R.drawable.pause_btn);
+            // set Progress bar values
+            sb.setProgress(0);
+            sb.setMax(100);
+
+            // Updating progress bar
+            updateProgressBar();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("error", "error:" + e.getMessage());
+        }
+    }
 
     private String arabicToDecimal(String number) {
         char[] chars = new char[number.length()];
@@ -210,13 +241,6 @@ public class MediaPlayerActivity extends AppCompatActivity {
             chars[i] = ch;
         }
         return new String(chars);
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Toast.makeText(getApplicationContext(), "Resume", Toast.LENGTH_SHORT).show();
     }
 
     class Player extends AsyncTask<String, Void, Boolean> {
@@ -281,38 +305,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
             progressDialog.show();
         }
     }
-    public void  playSurah(File applicationFile) {
-        try {
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(applicationFile.getPath());
-            mediaPlayer.prepare();
 
-            int result = am.requestAudioFocus(focusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                // other app had stopped playing song now , so u can do u stuff now .
-                updateProgressBar();
-                mediaPlayer.start();
-            }
-
-            // Changing Button Image to pause image
-            playMedia.setImageResource(R.drawable.pause_btn);
-            // set Progress bar values
-            sb.setProgress(0);
-            sb.setMax(100);
-
-            // Updating progress bar
-            updateProgressBar();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("error", "error:" + e.getMessage());
-        }
-    }
 
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -388,8 +381,8 @@ public class MediaPlayerActivity extends AppCompatActivity {
             IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
             registerReceiver(downloadReceiver, filter);
             Toast.makeText(MediaPlayerActivity.this, "جاري التحميل .. ", Toast.LENGTH_SHORT).show();
-
         }
+
     }
 
     private long DownloadData(Uri uri) {
@@ -545,8 +538,10 @@ public class MediaPlayerActivity extends AppCompatActivity {
             if (referenceId == Music_DownloadId) {
 
                 Toast toast = Toast.makeText(MediaPlayerActivity.this,
-                        "تم تحميل السورة", Toast.LENGTH_LONG);
+                        "تم تحميل سورة "+ name, Toast.LENGTH_LONG);
                 toast.show();
+
+                download.setImageResource(R.drawable.verified);
             }
 
         }
