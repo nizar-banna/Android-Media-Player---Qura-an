@@ -87,12 +87,12 @@
         android:id="@+id/no"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#ffffff"
-        android:textSize="60sp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="97dp"
-        android:text="TextView" />
+        android:layout_marginTop="42dp"
+        android:text="TextView"
+        android:textColor="#ffffff"
+        android:textSize="60sp" />
 
     <ImageView
         android:id="@+id/download"
@@ -104,10 +104,27 @@
         android:layout_marginEnd="51dp"
         app:srcCompat="@drawable/ic_download" />
 
-    <ImageView
-        android:id="@+id/t"
-        android:src="@mipmap/ic_launcher"
+
+    <TextView
+        android:id="@+id/rewayaName"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="160dp"
+        android:text="حفص عن عاصم"
+        android:textColor="@color/white"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/reciterName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="209dp"
+        android:text="مشاري العفاسي"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
 </RelativeLayout>

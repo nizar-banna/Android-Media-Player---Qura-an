@@ -23,7 +23,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MediaPlayerActivity" />
+        <activity android:name=".activity.MediaPlayerActivity"
+            android:configChanges="orientation|screenSize"
+
+            />
         <activity android:name=".language.BaseActivity" />
         <activity android:name=".SurahImages"></activity>
     </application>

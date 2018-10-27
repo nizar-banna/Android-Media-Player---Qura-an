@@ -15,8 +15,8 @@ import com.example.nizar.quraanapp.modal.Rewaya;
 
 import java.util.ArrayList;
 
-public class SpinnerRecitersAdapter extends ArrayAdapter<Rewaya> {
-    public SpinnerRecitersAdapter (Context context, ArrayList<Rewaya> list){
+public class SpinnerRewayaAdapter extends ArrayAdapter<Rewaya> {
+    public SpinnerRewayaAdapter(Context context, ArrayList<Rewaya> list){
         super(context,0,list);
 
     }

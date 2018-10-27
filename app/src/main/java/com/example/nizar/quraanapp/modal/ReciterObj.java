@@ -4,7 +4,7 @@ package com.example.nizar.quraanapp.modal;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Val {
+public class ReciterObj {
 
     @SerializedName("id")
     @Expose
@@ -84,4 +84,9 @@ public class Val {
         this.suras = suras;
     }
 
+    @Override
+    public String toString() {
+        return getName()+getServer()+getCount()+getId()+getLetter()+getRewaya()+getSuras()
+                +getCount();
+    }
 }

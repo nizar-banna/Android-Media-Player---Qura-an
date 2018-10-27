@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.media.AudioManager;
@@ -44,7 +45,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
     AudioManager am;
     TextView num;
     ImageView playMedia, download;
-    TextView currentPosition, totalPosition;
+    TextView currentPosition, totalPosition,rewayaName,reciterName;
     SeekBar sb;
     private boolean playPause;
     private ProgressDialog progressDialog;
@@ -54,7 +55,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
     private long Music_DownloadId;
     long referenceId;
     File applicationFile;
-    String path = "https://server11.mp3quran.net/hazza/001.mp3", name, number;
+    String path = "https://server11.mp3quran.net/hazza/001.mp3", name, number,server,reciter,rewaya;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,18 +65,33 @@ public class MediaPlayerActivity extends AppCompatActivity {
         Typeface m_typeFace = Typeface.createFromAsset(getAssets(), "kfc_naskh-webfont.otf");
         utils = new Utilities();
         am = (AudioManager) getSystemService(AUDIO_SERVICE);
+
         num = findViewById(R.id.no);
+        rewayaName = findViewById(R.id.rewayaName);
+        reciterName = findViewById(R.id.reciterName);
         playMedia = findViewById(R.id.btn_play);
         download = findViewById(R.id.download);
         currentPosition = findViewById(R.id.currentPosition);
         totalPosition = findViewById(R.id.totalPosition);
+
         Intent i = getIntent();
         name = i.getStringExtra("name");
         no = i.getIntExtra("no", 0);
+        SharedPreferences preferences=getSharedPreferences("PhoneBook",MODE_PRIVATE);
+        server = preferences.getString("server",server);
+        rewaya = preferences.getString("rewayaName",rewaya);
+        reciter = preferences.getString("reciterName",reciter);
+        rewayaName.setText(rewaya);
+        rewayaName.setTypeface(m_typeFace);
 
+        reciterName.setText(reciter);
+        reciterName.setTypeface(m_typeFace);
+
+        Log.d("Server",server);
         String with3digits = String.format("%03d", no);
         number = arabicToDecimal(with3digits); // number = 42;
-        path = "https://server8.mp3quran.net/frs_a/" + number + ".mp3";
+        path = server+"/" + number + ".mp3";
+        Log.d("Path",path);
 
         num.setText(name);
         num.setTypeface(m_typeFace);
@@ -258,6 +274,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
                         playPause = false;
                         mediaPlayer.stop();
                         mediaPlayer.reset();
+
                         playMedia.setImageResource(R.drawable.play_btn);
                     }
                 });
